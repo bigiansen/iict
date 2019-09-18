@@ -8,21 +8,19 @@ iict output_format(.jpg/.jpeg or .png) [file extension filters]
 ```
 
 - The arguments non case-sensitive.
-
-- Allowed input image formats are ([stb_image](https://github.com/nothings/stb/blob/master/stb_image.h)):
-    - `JPEG`, `PNG`, `TGA`, `BMP`, `PSD`, `GIF`, `HDR`, `PIC`, `PNM`
-    
+- Allowed input image formats are ([stb_image](https://github.com/nothings/stb/blob/master/stb_image.h))
+    - `JPEG`, `PNG`, `TGA`, `BMP`, `PSD`, `GIF`, `HDR`, `PIC`, `PNM`    
 - The allowed output format arguments are:
   - ` .jpg/.jpeg` 
-  - ` .png`
-  
+  - ` .png`  
 - The file extension filters are used textually and do not represent formats, 
-this means that if you want to convert all jpeg files, you should provide all possible extension representations (`.jpg`, `.jpeg`, etc.).
+this means that if you want to convert all jpeg files, 
+you should provide all possible extension representations (`.jpg`, `.jpeg`, etc.).
 
 - Files that correspond to the supplied extension filters that are not images, or are not supported by
 `stb_image` are ignored.
 
-## Examples:
+## Examples
 
 Convert all .jfif images to .jpg:
 
@@ -35,3 +33,9 @@ Convert all .jpg images to .png:
 ```
 iict .png .jpg .jpeg
 ```
+
+## Build Requirements
+
+- C++17 compiler, with `<filesystem>` or `<experimental/filesystem>` support.
+- CMake > 3.10
+- Git Submodules
