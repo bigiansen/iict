@@ -1,3 +1,6 @@
 [submodule "third-party/strutils"]
 	path = third-party/strutils
 	url = https://github.com/bigiansen/strutils
+[submodule "third-party/tqueue"]
+	path = third-party/tqueue
+	url = https://github.com/bigiansen/tqueue

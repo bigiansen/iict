@@ -9,7 +9,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build_debug_win64/output/bin/iict/iict.exe",
-            "args": [".png", ".jpeg"],
+            "args": [".png", ".jpeg", ".jpg"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build_debug_win64/output/bin/iict/",
             "environment": [],

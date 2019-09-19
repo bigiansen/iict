@@ -5,13 +5,13 @@
 #include <thread>
 
 #include <strutils/strutils.hpp>
+#include <ien/task_queue.hpp>
 
 #include <stb_image.h>
 #include <stb_image_write.h>
 
 #include "image.hpp"
 #include "std_filesystem.hpp"
-#include "task_queue.hpp"
 
 typename std::uint8_t u8;
 
@@ -59,61 +59,35 @@ int main(int argc, char** argv)
             paths.emplace(entry.path().u8string());
         }
     }
-    
-    if(max_threads >= paths.size())
+
+    ien::task_queue queue;
+    std::mutex paths_mux;
+    std::mutex cout_mux;
+    auto thread_lambda = [&]() 
     {
-        std::mutex cout_mux;
-        std::vector<std::thread> threads;
-        for(const std::string& strpath : paths)
+        STDFS_NAMESPACE::path path;
+        paths_mux.lock();
         {
-            threads.push_back(std::thread([&]() 
-            {
-                STDFS_NAMESPACE::path path(strpath);
-                image img(path.string());
-                path.replace_extension(ofmt_str);
-                
-                cout_mux.lock();
-                std::cout << ">> " << path.string() << std::endl;
-                cout_mux.unlock();     
-
-                img.write_to_file(path.string(), fmt);
-            }));
+            path = STDFS_NAMESPACE::path(*(paths.begin()));
+            paths.erase(paths.begin());
         }
+        paths_mux.unlock();
 
-        for(auto& th : threads)
-        {
-            th.join();
-        }
-    }
-    else
+        image img(path.string());
+        path.replace_extension(ofmt_str);
+
+        cout_mux.lock();
+        std::cout << ">> " << path.string() << std::endl;
+        cout_mux.unlock();
+
+        img.write_to_file(path.string(), fmt);
+    };
+
+    for(size_t i = 0; i < paths.size(); ++i)
     {
-        task_queue queue;
-        std::mutex paths_mux;
-        std::mutex cout_mux;
-        auto thread_lambda = [&]() 
-        {
-            STDFS_NAMESPACE::path path;
-            paths_mux.lock();
-            {
-                path = STDFS_NAMESPACE::path(*(paths.begin()));
-                paths.erase(paths.begin());
-            }
-            paths_mux.unlock();
-
-            image img(path.string());
-            path.replace_extension(ofmt_str);
-
-            cout_mux.lock();
-            std::cout << ">> " << path.string() << std::endl;
-            cout_mux.unlock();            
-
-            img.write_to_file(path.string(), fmt);
-        };
-
-        for(size_t i = 0; i < paths.size(); ++i)
-        {
-            queue.enqueue(thread_lambda);
-        }
-        queue.run(false);
+        queue.emplace_back(thread_lambda);
     }
+    queue.run();
+
+    std::cout << "Finished!" << std::endl;
 }
